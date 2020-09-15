@@ -1,0 +1,254 @@
+// ConsoleApplication1.cpp: определяет точку входа для консольного приложения.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+//специальный тип данных, чтобы узнать - правильно ли создан объект класса или нет
+enum StatusEr
+{
+	OK, Err
+};
+
+class Date
+{
+public:
+
+}
+
+//Описание класса Кошки
+class Students
+{
+public:
+	Students(string f, string n, string sn, int db, int v, int z); // конструктор - задаем ФИО, дату рождения, номер зачетки 
+											  // так как считаем, что не может быть кошка с пустой породой, бесцветная, с нулевым весом и без возраста
+	Students() { Status = Err; }				  // конструктор по умолчанию - добавляется для работы с указателями - нужен только для создания динамического объекта, 
+											  // поэтому не может использовать в других случаях!
+	~Students();
+//геттеры/селекторы - узнать значение атрибута (поля, характеристики объекта)
+	string getFamily();
+	string getName();
+	string getSurName();
+	int getDateBorn();
+	int getVes();
+	int getNumber();
+// специальный
+	bool getStatus(); //прежде чем начать работу со студентом - узнать, а можно ли с ним работать
+//сеттеры/модификаторы - установить (изменить) значение атрибута (поля, характеристики объекта), если это разрешено
+	bool setUpVes(int v); //студент может увеличить вес
+	bool setDownVes(int v); //студент может уменьшить вес
+//действия
+	void Go();    // студент идет
+	void Voice(); // студент говорит 
+	void Print(); //вывод информации о конкретном объекте, в дальнейшем лучше заменить на перегрузку операторов вывода!
+
+private:
+	string Family;
+	string Name;
+	string SurName;
+	int DateBorn;
+	int Ves;
+	int Zachetka;
+	int Status; //а можно ли с кошкой работать, или есть неверно определенные параметры
+
+	bool ChangeVes(int v); //служебный метод класса, недоступен извне! Сделан для того, чтобы единым образом проверять на допустимость попытку изменить вес кошки
+};
+
+//реализация
+Students::Students(string f, string n, string sn, int db, int v, int z)
+{
+	if (f == "" || n == "" || sn == "" || v <= 0 || db <= 0 || z <= 0) //заданы недопустимые значения полей - объект будет создан со статусом ошибка, чтобы нельзя было его использовать
+		Status = Err;
+	else {
+		Family = f;
+		Name = n;
+		SurName = sn;
+		DateBorn = db;
+		Ves = v;
+		Number = z;
+		Status = OK; // всё в порядке, кошка создана
+	}
+}
+
+Students::~Students()
+{
+}
+
+string Students::getFamily()
+{
+	if (Status == OK) return Family;
+	else return "";
+}
+
+string Students::getName()
+{
+	if (Status == OK) return Name;
+	else return "";
+}
+
+string Students::getSurName()
+{
+	if (Status == OK) return SurName;
+	else return "";
+}
+
+Date Student::getDateBorn()
+{
+	if (Status == OK) return DateBorn;
+	else return NULL;
+}
+
+int Student::getVes()
+{
+	if (Status == OK) return Ves;
+	else return 0;
+}
+
+int Cats::getNumber() 
+{
+	if (Status == OK) return Zachetka;
+	else return 0;
+}
+
+bool Cats::getStatus()
+{
+	return Status;
+}
+
+
+bool Students::ChangeVes(int v)
+{
+	int tmpV = Ves + v;
+	bool result = (tmpV >= 0); //не может у кошки быть отрицательный вес
+	if (result) Ves = tmpV; // вес остался положительным и изменился на величину v
+	return result; // вес не изменится, а метод вернет ложь
+}
+
+bool Students::setUpVes(int v) //кошка может увеличить вес
+{
+	if (Status == OK)
+		if (v <= 0) //отсекаем возможность ввести отрицательный шаг изменения веса, в противном случае можно вместо увеличения веса получить его уменьшение
+			return false;
+		else return ChangeVes(v);
+	else false;
+}
+
+bool Students::setDownVes(int v) //кошка может уменьшить вес
+{
+	if (Status == OK) 
+		if (v <= 0) //отсекаем возможность ввести отрицательный шаг изменения веса, в противном случае можно вместо уменьшенияя веса получить его увеличение
+			return false;
+		else return ChangeVes(-v);
+	else false;
+}
+
+bool Students::setName(string n) //студенту дали имя
+{
+	if (Status == OK)
+		if (n == "")   // нельзя дать студенту пустое имя
+			return false;
+		else { 
+			Name = nm;
+			return true;
+		}
+	else false;
+}
+
+void Cats::Go()    // кошка идет. Ходить может только правильная кошка (та, которая создана)
+{
+	if (Status == OK) {
+		cout << Name.c_str() << " пошел гулять\n";
+		cout << "@  \n";
+		cout << "   @\n";
+		cout << "@  \n";
+		cout << "   @\n";
+	}
+}
+
+void Students::Voice() // Студент нормально говорит. Говорить может только правильный студент (тот, который не Паша)
+{
+	if (Status == OK) {
+		cout << Name.c_str() <<" говорит по-человечески ";
+	}
+}
+
+void Cats::Print() // вывод информации о конкретном объекте класса Кошка. Вывести можно информацию только о правильной кошке
+{
+	if (Status == OK) {
+		cout << "\nЭкземпляр класса Кошки: " << "Имя - " << Name.c_str() << ", порода - " << Poroda.c_str() << ",\n";
+		cout << "год рождения - " << YearBirth << ", вес - " << Ves << ".\n";
+		cout << "Ах да, и цвет шёрстки - " << Color.c_str() << "\n\n";
+	}
+}
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	//неправильно созданный студент(Паша)
+	cout << "Создать 1-й объект студент и поработать с ней\n"; 
+	Students Student1("", "", -3, 2016); // создаем экземпляр класса Кошка, на задаем неверное значение вес
+	//пытаемся с ней поработать
+		Student1.setName("");
+		Student1.Print();
+		Student1.Voice();
+		if (Student1.setDownVes(-5))
+			cout << Cat1.getName().c_str() << " похудел на " << Cat1.getVes() << " кг. \n";
+		else cout << "Ошибка ввода при уменьшении веса кота " << Cat1.getName().c_str() << "!\n";
+
+	
+	
+	cout << "\nСоздать 2-й объект кошка и поработать с ней\n"; // создаем экземпляр класса Кошка
+	Cats Cat2("Перс", "Белый", 2, 2015);
+
+		Cat2.setName("Мурзик");
+		Cat2.Print();
+		Cat2.Voice();
+		Cat2.Go();
+		int StepV; //шаг изменения веса
+
+		StepV = -1; //посадили на диету, но не правильно
+		if (Cat2.setDownVes(StepV))
+			cout << Cat2.getName().c_str() << " похудел на " << Cat2.getVes() << " кг. \n";
+		else cout << "Ошибка ввода при уменьшении веса кота "<< Cat2.getName().c_str() << "!\n";
+		StepV = 1;//посадили на диету правильно
+		if (Cat2.setDownVes(StepV))
+			cout << Cat2.getName().c_str() << " похудел на " << Cat2.getVes() << " кг. \n";
+		else cout << "Ошибка ввода при уменьшении веса кота " << Cat2.getName().c_str() << "!\n";
+
+		StepV = -1; // стали кормить, но не правильно
+		if (Cat2.setUpVes(StepV))
+			cout << Cat2.getName().c_str() << " поправился на " << Cat2.getVes() << " кг. \n";
+		else cout << "Ошибка ввода при увеличении веса кота " << Cat2.getName().c_str() << "!\n";
+		StepV = 1; //кормят правильно
+		if (Cat2.setUpVes(StepV))
+			cout << Cat2.getName().c_str() << " поправился на " << Cat2.getVes() << " кг. \n";
+		else cout << "Ошибка ввода при увеличении веса кота " << Cat2.getName().c_str() << "!\n";
+
+
+	cout << "\nСоздать 3-й объект кошка и поработать с ней\n"; // создаем экземпляр класса Кошка
+	Cats Cat3("Сиамка", "Серая", 3, 2001);
+
+	Cat3.Print();
+
+	//А теперь все кошки будут что-то делать вместе!
+	cout << "\n\n А теперь все кошки будут что-то делать вместе!\n\n";
+	Cats* lCats;
+	lCats = new Cats[3];
+	
+	lCats[0] = Cat1;
+	lCats[1] = Cat2;
+	lCats[2] = Cat3;
+
+	for (int i = 0; i < 3; i++)  
+		{
+			lCats[i].Voice();
+			lCats[i].Go();
+		}
+
+	system("pause");
+    return 0;
+}
+
