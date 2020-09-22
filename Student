@@ -177,8 +177,7 @@ bool Students::setNapr(string napr)
 	return false;
 }
 
-void Cats::Go()    // кошка идет. Ходить может только правильная кошка (та, которая создана)
-{
+void Students::Go()
 	if (Status == OK) {
 		cout << Name.c_str() << " пошел гулять\n";
 	}
@@ -191,8 +190,7 @@ void Students::Voice() // Студент нормально говорит. Го
 	}
 }
 
-void Cats::Print() // вывод информации о конкретном объекте класса Кошка. Вывести можно информацию только о правильной кошке
-{
+void Students::Print() 
 	if (Status == OK) {
 		cout << "\nСтудент: " << "Фамилия - " << Name << ", Имя - " << Family << ", Отчество - " << SurName << ",\n";
 		cout << "год поступления - " << DatePost << ", факультет - " << faculty << ", направление - " << napr << ", номер зачетки - " << Number << "\n";
