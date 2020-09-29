@@ -32,7 +32,7 @@ class Students
 public:
 	Students(string f, string n, string sn, int dp, string fac, string napr, int z); // конструктор - задаем ФИО, дату рождения, номер зачетки 
 											  // так как считаем, что не может быть кошка с пустой породой, бесцветная, с нулевым весом и без возраста
-	Students() { Status = Err; }				  // конструктор по умолчанию - добавляется для работы с указателями - нужен только для создания динамического объекта, 
+	Students() { Status = Err; }                  // конструктор по умолчанию - добавляется для работы с указателями - нужен только для создания динамического объекта, 
 											  // поэтому не может использовать в других случаях!
 	~Students();
 	//геттеры/селекторы - узнать значение атрибута (поля, характеристики объекта)
@@ -180,7 +180,7 @@ void Students::Go()
 void Students::Voice() // Студент нормально говорит. Говорить может только правильный студент
 {
 	if (Status == OK) {
-		cout << Family + " " << Name + " " << SurName << " говорит по-человечески ";
+		cout << Family + " " << Name + " " << SurName << " говорит по-человечески\n";
 	}
 }
 
@@ -194,32 +194,37 @@ void Students::Print()
 }
 
 struct node {
-	Students inf;
-	node *next;
-	node *prev;
+	Students* inf;
+	node* next;
+	node* prev;
 };
 
 class List {
 private:
 	node* head;
 	node* tail;
-	node* find_n(Students x);
-	void insert_after(node* elem, Students x);
+	node* find_n(Students& x);
+	void insert_after(node* elem, Students& x);
 	bool erase_n(node* elem);
 public:
 	List() { head = NULL; tail = NULL; }
-	void push(Students x);
-	Students* find(Students x);
-	bool erase(Students x);
+	void push(Students& x);
+	void insert(Students& x, Students& y);
+	Students* find(Students& x);
+	bool erase(Students& x);
 	void print();
 	// остальные функции необходимые для работы списка
 };
 
-void List::push(Students x) { //теперь сам список знает, где его голова и хвост, а остальным об этом знать не следует
+void List::push(Students& x)
+{ //теперь сам список знает, где его голова и хвост, а остальным об этом знать не следует
 	if (x.getStatus() != OK)
+	{
+		cout << "Студент описан неверно, не добавляем к списку\n";
 		return;
-	node *r = new node;
-	r->inf = x;
+	}
+	node* r = new node;
+	r->inf = &x;
 	r->next = NULL;
 	if (!head && !tail) {
 		r->prev = NULL;
@@ -234,25 +239,25 @@ void List::push(Students x) { //теперь сам список знает, г�
 
 void List::print()
 {
-	node *r = head;
+	node* r = head;
 	while (r != NULL) {
-		r->inf.Print();
+		r->inf->Print();
 		r = r->next;
 	}
 	cout << '\n';
 }
-node* List::find_n(Students x)
+node* List::find_n(Students& x)
 {
-	for (node *r = head; r != NULL; r = r->next)
-		if (r->inf == x)
+	for (node* r = head; r != NULL; r = r->next)
+		if (r->inf == &x)
 			return r;
 	return NULL;
 }
 
-void List::insert_after(node *elem, Students x)
+void List::insert_after(node* elem, Students& x)
 {
-	node *r = new node;
-	r->inf = x;
+	node* r = new node;
+	r->inf = &x;
 	if (head == NULL)
 		head = tail = r;
 	else if (elem == tail)
@@ -291,21 +296,21 @@ bool List::erase_n(node* elem)
 		elem->next->prev = elem->prev;
 		elem->prev->next = elem->next;
 	}
-	
+
 	delete elem;// Удаление элемента
 	return true;
 }
 
-bool List::erase(Students x)
+bool List::erase(Students& x)
 {
 	return erase_n(find_n(x));
 }
-Students* List::find(Students x)
+Students* List::find(Students& x)
 {
 	node* r = find_n(x);
 	if (r == NULL)
 		return NULL;
-	return &(r->inf);
+	return (r->inf);
 }
 
 
@@ -318,6 +323,11 @@ bool Students::operator==(const Students& otherStudents) const
 		Faculty == otherStudents.Faculty &&
 		Napr == otherStudents.Napr &&
 		Zachetka == otherStudents.Zachetka;
+}
+
+void List::insert(Students& x, Students& y)
+{
+	insert_after(find_n(x), y);
 }
 
 int main()
@@ -336,6 +346,11 @@ int main()
 	chel2.Voice();
 	chel1.setName("Паша");
 	chel2.setFamily("Агиадов");
+	lst.print();
+	Students chel4("Петров", "Петр", "Петрович", 2019, "КНиИТ", "ПИ", 20199887);
+	lst.insert(chel1, chel4);
+	lst.print();
+	lst.erase(chel1);
 	lst.print();
 	system("pause");
 	return 0;
