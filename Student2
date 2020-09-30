@@ -1,0 +1,359 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+#include<iostream>
+#include<cmath>
+#include<string>
+#include<algorithm>
+#include<vector>
+#include<set>
+#include<cstdio>
+#include<iomanip>
+#include<fstream>
+#include<cstdlib>
+#include<stack>
+#include<map>
+#include<list>
+#include<queue>
+// ConsoleApplication1.cpp: определяет точку входа для консольного приложения.
+//
+
+using namespace std;
+
+//специальный тип данных, чтобы узнать - правильно ли создан объект класса или нет
+enum StatusEr
+{
+	OK, Err
+};
+
+//Описание класса Студент
+class Students
+{
+public:
+	Students(string f, string n, string sn, int dp, string fac, string napr, int z); // конструктор - задаем ФИО, дату рождения, номер зачетки 
+											  // так как считаем, что не может быть кошка с пустой породой, бесцветная, с нулевым весом и без возраста
+	Students() { Status = Err; }                  // конструктор по умолчанию - добавляется для работы с указателями - нужен только для создания динамического объекта, 
+											  // поэтому не может использовать в других случаях!
+	~Students();
+	//геттеры/селекторы - узнать значение атрибута (поля, характеристики объекта)
+	string getFamily();
+	string getName();
+	string getSurName();
+	int getDatePost();
+	string getNapr();
+	int getNumber();
+	// специальный
+	bool getStatus(); //прежде чем начать работу со студентом - узнать, а можно ли с ним работать
+//сеттеры/модификаторы - установить (изменить) значение атрибута (поля, характеристики объекта), если это разрешено
+	bool setName(string n);
+	bool setFamily(string f);
+	bool setNapr(string napr);
+	void setNumber(int z);
+	//действия
+	void Go();    // студент идет
+	void Voice(); // студент говорит 
+	void Print();
+	bool operator==(const Students& otherStudents) const;
+
+private:
+	string Family;
+	string Name;
+	string SurName;
+	int DatePost;
+	string Faculty;
+	string Napr;
+	int Zachetka;
+	int Status;
+	bool ChangeNapr(string napr); //служебный метод класса, недоступен извне! Сделан для того, чтобы единым образом проверять на допустимость попытку изменить вес кошки
+};
+
+//реализация
+Students::Students(string f, string n, string sn, int db, string fac, string napr, int z)
+{
+	if (f == "" || n == "" || sn == "" || fac == "" || napr == "" || db <= 0 || z <= 0) //заданы недопустимые значения полей - объект будет создан со статусом ошибка, чтобы нельзя было его использовать
+		Status = Err;
+	else {
+		Family = f;
+		Name = n;
+		SurName = sn;
+		DatePost = db;
+		Faculty = fac;
+		Napr = napr;
+		Zachetka = z;
+		Status = OK; // всё в порядке, кошка создана
+	}
+}
+
+Students::~Students()
+{
+}
+
+string Students::getFamily()
+{
+	if (Status == OK) return Family;
+	else return "";
+}
+
+string Students::getName()
+{
+	if (Status == OK) return Name;
+	else return "";
+}
+
+string Students::getSurName()
+{
+	if (Status == OK) return SurName;
+	else return "";
+}
+
+int Students::getDatePost()
+{
+	if (Status == OK) return DatePost;
+	else return 0;
+}
+
+string Students::getNapr()
+{
+	if (Status == OK) return Napr;
+	else return "";
+}
+
+int Students::getNumber()
+{
+	if (Status == OK) return Zachetka;
+	else return 0;
+}
+
+bool Students::getStatus()
+{
+	return Status;
+}
+
+void Students::setNumber(int z)
+{
+	if (z > 0)
+		Zachetka = z;
+}
+
+bool Students::setName(string n) //студент поменял имя
+{
+	if (Status == OK)
+		if (n == "")
+			return false;
+		else {
+			Name = n;
+			return true;
+		}
+	else return false;
+}
+bool Students::setFamily(string f) //студент поменял имя
+{
+	if (Status == OK)
+		if (f == "")
+			return false;
+		else {
+			Family = f;
+			return true;
+		}
+	else return false;
+}
+
+bool Students::ChangeNapr(string napr)
+{
+	Napr = napr;
+	return true;
+}
+
+bool Students::setNapr(string napr)
+{
+	if (napr != "")
+		return ChangeNapr(napr);
+	return false;
+}
+
+void Students::Go()
+{
+	if (Status == OK)
+		cout << Family + " " << Name + " " << SurName << " пошел гулять с друзьями\n\n";
+}
+
+void Students::Voice() // Студент нормально говорит. Говорить может только правильный студент
+{
+	if (Status == OK) {
+		cout << Family + " " << Name + " " << SurName << " говорит по-человечески\n\n";
+	}
+}
+
+void Students::Print()
+{
+	if (Status == OK)
+	{
+		cout << "Студент: " << "Фамилия - " << Family << ", Имя - " << Name << ", Отчество - " << SurName << ",\n";
+		cout << "год поступления - " << DatePost << ", факультет - " << Faculty << ", направление - " << Napr << ", номер зачетки - " << Zachetka << "\n";
+	}
+}
+
+struct node {
+	Students* inf;
+	node* next;
+	node* prev;
+};
+
+class List {
+private:
+	node* head;
+	node* tail;
+	node* find_n(Students& x);
+	void insert_after(node* elem, Students& x);
+	bool erase_n(node* elem);
+public:
+	List() { head = NULL; tail = NULL; }
+	void push(Students& x);
+	void insert(Students& x, Students& y);
+	Students* find(Students& x);
+	bool erase(Students& x);
+	void print();
+	// остальные функции необходимые для работы списка
+};
+
+void List::push(Students& x)
+{ //теперь сам список знает, где его голова и хвост, а остальным об этом знать не следует
+	if (x.getStatus() != OK)
+	{
+		cout << "Студент описан неверно, не добавляем к списку\n\n";
+		return;
+	}
+	node* r = new node;
+	r->inf = &x;
+	r->next = NULL;
+	if (!head && !tail) {
+		r->prev = NULL;
+		head = r;
+	}
+	else {
+		tail->next = r;
+		r->prev = tail;
+	}
+	tail = r;
+}
+
+void List::print()
+{
+	node* r = head;
+	while (r != NULL) {
+		r->inf->Print();
+		r = r->next;
+	}
+	cout << '\n';
+}
+node* List::find_n(Students& x)
+{
+	for (node* r = head; r != NULL; r = r->next)
+		if (r->inf == &x)
+			return r;
+	return NULL;
+}
+
+void List::insert_after(node* elem, Students& x)
+{
+	node* r = new node;
+	r->inf = &x;
+	if (head == NULL)
+		head = tail = r;
+	else if (elem == tail)
+	{
+		r->prev = elem;
+		elem->next = r;
+		tail = r;
+	}
+	else
+	{
+		elem->next->prev = r;
+		r->next = elem->next;
+		r->prev = elem;
+		elem->next = r;
+	}
+}
+
+bool List::erase_n(node* elem)
+{
+	if (elem == NULL)
+		return false;
+	if (elem == head && elem == tail)
+		head = tail = NULL;
+	else if (elem == head)
+	{
+		head = head->next;
+		head->prev = NULL;
+	}
+	else if (elem == tail)
+	{
+		tail = tail->prev;
+		tail->next = NULL;
+	}
+	else
+	{
+		elem->next->prev = elem->prev;
+		elem->prev->next = elem->next;
+	}
+
+	delete elem;
+	return true;
+}
+
+bool List::erase(Students& x)
+{
+	return erase_n(find_n(x));
+}
+Students* List::find(Students& x)
+{
+	node* r = find_n(x);
+	if (r == NULL)
+		return NULL;
+	return (r->inf);
+}
+
+
+bool Students::operator==(const Students& otherStudents) const
+{
+	return Family == otherStudents.Family &&
+		Name == otherStudents.Name &&
+		SurName == otherStudents.SurName &&
+		DatePost == otherStudents.DatePost &&
+		Faculty == otherStudents.Faculty &&
+		Napr == otherStudents.Napr &&
+		Zachetka == otherStudents.Zachetka;
+}
+
+void List::insert(Students& x, Students& y)
+{
+	insert_after(find_n(x), y);
+}
+
+int main()
+{
+	setlocale(LC_ALL, "russian");
+	List lst;
+	Students chel1("Иванов", "Иван", "Иванович", 2019, "КНиИТ", "ПИ", 20196789);
+	lst.push(chel1);
+	Students chel2("Миронов", "Леонид", "Сергеевич", 2018, "КНиИТ", "ПИ", 20182211);
+	lst.push(chel2);
+	lst.print();
+	Students chel3("", "Иван", "Иванович", 2019, "КНиИТ", "ПИ", 20196789);
+	lst.push(chel3);
+	lst.print();
+	chel1.Go();
+	chel2.Voice();
+	chel1.setName("Паша");
+	chel2.setFamily("Агиадов");
+	lst.print();
+	Students chel4("Петров", "Петр", "Петрович", 2019, "КНиИТ", "ПИ", 20199887);
+	lst.insert(chel1, chel4);
+	lst.print();
+	lst.find(chel2)->Print();
+	cout << "\n";
+	lst.erase(chel1);
+	lst.print();
+	system("pause");
+	return 0;
+}
