@@ -1,0 +1,344 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+#include<iostream>
+#include<cmath>
+#include<string>
+#include<algorithm>
+#include<vector>
+#include<set>
+#include<cstdio>
+#include<iomanip>
+#include<fstream>
+#include<cstdlib>
+#include<stack>
+#include<map>
+#include<list>
+#include<queue>
+
+using namespace std;
+
+
+class Edition //Печатное издание
+{
+protected:
+	// Тип, Год производства, Место издательства, Язык, Имя, статус
+	string Type;
+	int Year;
+	string Place;
+	string Language;
+	string Name;
+	bool Status;
+public:
+	Edition(string n, string l, string p, int y, string t = "Печатное издание" ) : Name(n), Language(l), Place(p), Year(y), Type(t) {//коструктор с проверкой на статус
+		if (n != "" && l != "" && p != "" && y > 0)
+			Status = true;
+		else
+			Status = false;
+	};
+	// геттеры Типа, Года производства, Места издательства, Языка, Имени
+	string getName() { return Name; }
+	string getLanguage() { return Language; }
+	string getPlace() { return Place; }
+	int getYear() { return Year; }
+	string getType() { return Type; }
+	virtual void Print()//вывод информации
+	{
+		cout << Type << " под названием " << Name << '\n';
+		cout << "Язык - " << Language << '\n';
+		cout << "Место издательства - " << Place << '\n';
+		cout << "Год печати - " << Year << '\n';
+		cout << '\n';
+	}
+	virtual bool operator==(const Edition& otherEdition) const;//сравнение
+	virtual bool getStatus() { return Status; }//геттер для статуса
+};
+
+class Book : public Edition//Книга, наследуется от Печатного издания
+{
+protected:
+	//Автор, Часть
+	string Author;
+	int Part;
+public:
+	Book(string n, string l, string p, int y, string a, int pt = 1, string t = "Книга") : Edition(n, l, p, y, t), Author(a), Part(pt) {//коструктор с проверкой на статус
+		if (n != "" && l != "" && p != "" && y > 0 && a != "" && pt > 0)
+			Status = true;
+		else
+			Status = false;
+	};
+	//геттеры Автора и Части
+	string getAuthor() { return Author; }
+	int getPart() { return Part; }
+	virtual void Print()//вывод информации
+	{
+		cout << Type << " под названием " << Name << '\n';
+		cout << "Язык - " << Language << '\n';
+		cout << "Место издательства - " << Place << '\n';
+		cout << "Год печати - " << Year << '\n';
+		cout << "Автор - " << Author << '\n';
+		cout << "Часть " << Part << '\n';
+		cout << '\n';
+	}
+	virtual bool operator==(const Book& otherBook) const;//сравнение
+};
+
+class Journal : public Edition//Журнал, наследуется от Печатного издания
+{
+private:
+	//Номер выпуска, Компания
+	int Number;
+	string Company;
+public:
+	Journal(string n, string l, string p, int y, string c, int num, string t = "Журнал") : Edition(n, l, p, y, t), Company(c), Number(num) {//коструктор с проверкой на статус
+		if (n != "" && l != "" && p != "" && y > 0 && c != "" && num > 0)
+			Status = true;
+		else
+			Status = false;
+	};
+	//геттеры Номера выпуска, Компании
+	string getCompany() { return Company; }
+	int getNumber() { return Number; }
+	virtual void Print()//вывод информации
+	{
+		cout << Type << " под названием " << Name << '\n';
+		cout << "Язык - " << Language << '\n';
+		cout << "Место издательства - " << Place << '\n';
+		cout << "Год печати - " << Year << '\n';
+		cout << "Компания - " << Company << '\n';
+		cout << "Номер выпуска " << Number << '\n';
+		cout << '\n';
+	}
+	virtual bool operator==(const Journal &otherJournal) const;//сравнение
+};
+
+class Textbook : public Book//Учебник, наследуется от Книги
+{
+private:
+	//Номер класса, Урок
+	int ClassNum;
+	string Lesson;
+public:
+	Textbook(string n, string l, string p, int y, string a, int pt, int cn, string ls, string t = "Учебник") : Book(n, l, p, y, a, pt, t), ClassNum(cn), Lesson(ls) {//коструктор с проверкой на статус
+		if (n != "" && l != "" && p != "" && y > 0 && a != "" && pt > 0 && cn > 0 && ls != "")
+			Status = true;
+		else
+			Status = false;
+	};
+	//геттер Номера класса, Урока
+	int getClassNum() { return ClassNum; }
+	string getLesson() { return Lesson; }
+	virtual void Print()//вывод информации
+	{
+		cout << Type << " под названием " << Name << '\n';
+		cout << "Язык - " << Language << '\n';
+		cout << "Место издательства - " << Place << '\n';
+		cout << "Год печати - " << Year << '\n';
+		cout << "Автор - " << Author << '\n';
+		cout << "Часть " << Part << '\n';
+		cout << ClassNum << "-й класс\n";
+		cout << "Урок - " << Lesson << '\n';
+		cout << '\n';
+	}
+	virtual bool operator==(const Textbook& otherTextbook) const;//сравнение
+};
+
+
+struct node {//структура списка
+	Edition* inf;
+	node* next;
+	node* prev;
+};
+
+class List {//класс списка
+private:
+	node* head;
+	node* tail;
+	node* find_n(Edition& x);
+	void insert_after(node* elem, Edition& x);
+	bool erase_n(node* elem);
+public:
+	List() { head = NULL; tail = NULL; }
+	void push(Edition& x);
+	void insert(Edition& x, Edition& y);
+	Edition* find(Edition& x);
+	bool erase(Edition& x);
+	void print();
+	// остальные функции необходимые для работы списка
+};
+
+void List::push(Edition& x)//положить в конец
+{
+	if (!x.getStatus())
+	{
+		cout << "Объект создан неправильно\n\n";
+		return;
+	}
+	node* r = new node;
+	r->inf = &x;
+	r->next = NULL;
+	if (!head && !tail) {
+		r->prev = NULL;
+		head = r;
+	}
+	else {
+		tail->next = r;
+		r->prev = tail;
+	}
+	tail = r;
+}
+
+void List::print()//вывести список
+{
+	node* r = head;
+	while (r != NULL) {
+		r->inf->Print();
+		r = r->next;
+	}
+	cout << '\n';
+}
+node* List::find_n(Edition& x)//найти
+{
+	for (node* r = head; r != NULL; r = r->next)
+		if (r->inf == &x)
+			return r;
+	return NULL;
+}
+
+void List::insert_after(node* elem, Edition& x)//вставить после чего-то
+{
+	if (!x.getStatus())
+	{
+		cout << "Объект создан неправильно\n\n";
+		return;
+	}
+	node* r = new node;
+	r->inf = &x;
+	if (head == NULL)
+		head = tail = r;
+	else if (elem == tail)
+	{
+		r->prev = elem;
+		elem->next = r;
+		tail = r;
+	}
+	else
+	{
+		elem->next->prev = r;
+		r->next = elem->next;
+		r->prev = elem;
+		elem->next = r;
+	}
+}
+
+bool List::erase_n(node* elem)//удалить
+{
+	if (elem == NULL)
+		return false;
+	if (elem == head && elem == tail)
+		head = tail = NULL;
+	else if (elem == head)
+	{
+		head = head->next;
+		head->prev = NULL;
+	}
+	else if (elem == tail)
+	{
+		tail = tail->prev;
+		tail->next = NULL;
+	}
+	else
+	{
+		elem->next->prev = elem->prev;
+		elem->prev->next = elem->next;
+	}
+
+	delete elem;
+	return true;
+}
+
+bool List::erase(Edition& x)//удалить
+{
+	return erase_n(find_n(x));
+}
+Edition* List::find(Edition& x)//найти
+{
+	node* r = find_n(x);
+	if (r == NULL)
+		return NULL;
+	return (r->inf);
+}
+
+
+bool Edition::operator==(const Edition& otherEdition) const
+{
+	return Type == otherEdition.Type &&
+		Name == otherEdition.Name &&
+		Year == otherEdition.Year &&
+		Place == otherEdition.Place &&
+		Language == otherEdition.Language;
+}
+
+bool Book::operator==(const Book& otherBook) const
+{
+	if (Edition::operator==(otherBook))
+	{
+		return Author == otherBook.Author &&
+			Part == otherBook.Part;
+	}
+	return false;
+}
+
+bool Journal::operator==(const Journal& otherJournal) const
+{
+	if (Edition::operator==(otherJournal))
+	{
+		return Number == otherJournal.Number &&
+			Company == otherJournal.Company;
+	}
+	return false;
+}
+
+bool Textbook::operator==(const Textbook& otherTextbook) const
+{
+	if (Book::operator==(otherTextbook))
+	{
+		return ClassNum == otherTextbook.ClassNum &&
+			Lesson == otherTextbook.Lesson;
+	}
+	return false;
+}
+
+void List::insert(Edition& x, Edition& y)//вставить после чего-то
+{
+	insert_after(find_n(x), y);
+}
+
+
+int main()
+{
+	setlocale(LC_ALL, "russian");
+	List lst;
+	Edition ed("ООП", "русский", "Саратов", 2020, "Предмет");
+	lst.push(ed);
+	Edition ed2("ИнфПрог", "english", "Саратов", 2019);
+	lst.push(ed2);
+	Book b("Гарри Поттер и узник Азкабана", "русский", "Moskow", 2011, "Дж. К. Ролинг", 3);
+	lst.push(b);
+	Textbook t("Сборник сочинений по русскому языку", "русский", "Москва", 2013, "Баранов", 1, 6, "русский язык", "Сборник");
+	lst.push(t);
+	Journal j("Картина маслом", "украiнський", "Львов", 2000, "Хохот и грохот", 365, "Несерьезный журнальчик");
+	lst.push(j);
+	lst.print();
+	cout << '\n';
+	Edition ed3("ИнфПрог", "русский", "Саратов", 2019);
+	lst.insert(b, ed3);
+	lst.print();
+	lst.erase(ed2);
+	lst.print();
+	lst.find(t)->Print();
+	Book b2("", "русский", "Moskow", 2011, "Дж. К. Ролинг", 3);
+	lst.push(b2);
+	lst.print();
+	return 0;
+}
