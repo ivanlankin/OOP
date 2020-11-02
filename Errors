@@ -93,8 +93,6 @@ Students::Students(string f, string n, string sn, int db, string fac, string nap
 {
 	try
 	{
-		/*if (!freopen("input.txt", "r", ))
-			throw FileError();*/
 		if (n.size() > 20)
 			throw Wowow();
 		else if (db >= 2100)
@@ -385,28 +383,39 @@ void List::insert(Students& x, Students& y)
 
 int main()
 {
-	setlocale(LC_ALL, "russian");
-	List lst;
-	Students chel1("Иванов", "Иван", "Иванович", 2019, "КНиИТ", "ПИ", 20196789);
-	lst.push(chel1);
-	Students chel2("Миронов", "Леонид", "Сергеевич", 2018, "КНиИТ", "ПИ", 20182211);
-	lst.push(chel2);
-	lst.print();
-	Students chel3("", "Иванe", "Иванович", 20192, "КНиИТ", "ПИ", 20196789);
-	lst.push(chel3);
-	lst.print();
-	chel1.Go();
-	chel2.Voice();
-	chel1.setName("Паша");
-	chel2.setFamily("Агиадов");
-	lst.print();
-	Students chel4("Петров", "Петр", "Петрович", 2019, "КНиИТ", "ПИ", 20199887);
-	lst.insert(chel1, chel4);
-	lst.print();
-	lst.find(chel2)->Print();
-	cout << "\n";
-	lst.erase(chel1);
-	lst.print();
-	system("pause");
-	return 0;
+		setlocale(LC_ALL, "russian");
+	try
+	{
+		ifstream file("input.txt");
+		if (!file.is_open())
+			throw FileError();
+		List lst;
+		Students chel1("Иванов", "Иван", "Иванович", 2019, "КНиИТ", "ПИ", 20196789);
+		lst.push(chel1);
+		Students chel2("Миронов", "Леонид", "Сергеевич", 2018, "КНиИТ", "ПИ", 20182211);
+		lst.push(chel2);
+		lst.print();
+		Students chel3("", "Иванe", "Иванович", 2019, "КНиИТ", "ПИ", 20196789);
+		lst.push(chel3);
+		lst.print();
+		chel1.Go();
+		chel2.Voice();
+		chel1.setName("Паша");
+		chel2.setFamily("Агиадов");
+		lst.print();
+		Students chel4("Петров", "Петр", "Петрович", 2019, "КНиИТ", "ПИ", 20199887);
+		lst.insert(chel1, chel4);
+		lst.print();
+		lst.find(chel2)->Print();
+		cout << "\n";
+		lst.erase(chel1);
+		lst.print();
+		system("pause");
+		return 0;
+	}
+	catch (Wowow &m)
+	{
+		m.print();
+	}
+
 }
